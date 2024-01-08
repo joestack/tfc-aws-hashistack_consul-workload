@@ -19,7 +19,7 @@ apt-get -y install \
   unzip ntp dnsmasq dnsmasq-base dnsutils jq
 
 echo "--> Setting hostname..."
-echo "${node_name}" | sudo tee /etc/hostname
+echo "${consul_svc_id}" | sudo tee /etc/hostname
 sudo hostname -F /etc/hostname
 
 echo "--> Adding hostname to /etc/hosts"
