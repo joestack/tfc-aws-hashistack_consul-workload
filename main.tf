@@ -42,6 +42,7 @@ locals {
   consul_ca_file         = data.terraform_remote_state.hcp.outputs.consul_ca_file
   vpc_id                 = data.terraform_remote_state.hcp.outputs.vpc_id
   vpc_cidr               = data.terraform_remote_state.hcp.outputs.vpc_cidr
+  consul_vpc_security_id = data.terraform_remote_state.hcp.outputs.consul_vpc_security_id
   hashistack_subnet      = data.terraform_remote_state.hcp.outputs.hashistack_subnet
 }
 
@@ -64,6 +65,7 @@ data "template_file" "client" {
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
+      consul_vpc_security_id = local.consul_vpc_security_id
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
@@ -97,8 +99,8 @@ resource "aws_instance" "consul_client_web" {
   instance_type               = "t2.small"
   associate_public_ip_address = true
   subnet_id                   = element(local.hashistack_subnet, count.index)
-#   vpc_security_group_ids = []
-  key_name = var.pub_key
+  vpc_security_group_ids    = [ local.consul_vpc_security_id ]
+  key_name                  = var.pub_key
 
   tags = {
     Name = "webservice-${count.index}"
