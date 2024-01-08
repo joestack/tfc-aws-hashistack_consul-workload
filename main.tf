@@ -57,8 +57,8 @@ provider "consul" {
 data "template_file" "client" {
   count = var.node_count
   template = (join("\n", tolist([
-    file("${path.root}/templates/base.sh"),
-    file("${path.root}/templates/client.sh")
+    file("${path.root}/scripts/base.sh"),
+    file("${path.root}/scripts/client.sh")
   ])))
   vars = {
       consul_ca         = local.consul_ca_file
