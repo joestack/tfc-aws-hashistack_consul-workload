@@ -100,18 +100,22 @@ service {
 EOF
 
 chown --recursive consul:consul /etc/consul.d
-
 }
 
-cd /home/ubuntu/
+start_service() {
+  systemctl enable $1.service
+  systemctl start $1.service
+}
 
-echo "${consul_service}" | base64 -d >consul.service
+
+
+cd /home/ubuntu/
 
 setup_networking
 setup_deps
 
 setup_consul
-consul_service
+#consul_service
 
 start_service "consul"
 
