@@ -4,7 +4,7 @@
 ###   COMMON BLOCK   ###
 ########################
 common() {
-  echo "${server_ca}" > /etc/ssl/certs/hashistack_ca.pem
+  echo "${consul_ca}" > /etc/ssl/certs/hashistack_ca.pem
 }
 
 install_deps() {
