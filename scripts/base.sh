@@ -25,7 +25,7 @@ sudo hostname -F /etc/hostname
 echo "--> Adding hostname to /etc/hosts"
 sudo tee -a /etc/hosts > /dev/null <<EOF
 # For local resolution
-$(private_ip)  ${node_name} ${node_name}.node.consul
+$(private_ip)  ${consul_svc_id} ${consul_svc_id}.node.consul
 EOF
 
 systemctl enable ntp.service
