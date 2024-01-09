@@ -52,9 +52,6 @@ provider "consul" {
   token      = local.consul_init_token
 }
 
-
-
-
 data "template_file" "client" {
   count = var.node_count
   template = (join("\n", tolist([
@@ -78,7 +75,7 @@ data "template_file" "client" {
       }
 }
 
-data "template_cloudinit_config" "server" {
+data "template_cloudinit_config" "client" {
   count         = var.node_count
   gzip          = true
   base64_encode = true
@@ -101,6 +98,8 @@ resource "aws_instance" "consul_client_web" {
   subnet_id                   = element(local.hashistack_subnet, count.index)
   vpc_security_group_ids    = [ local.consul_vpc_security_id ]
   key_name                  = var.pub_key
+  user_data = element(data.template_cloudinit_config.client.*.rendered, count.index)
+
 
   tags = {
     Name = "webservice-${count.index}"
