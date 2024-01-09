@@ -50,6 +50,7 @@ setup_consul() {
   defaults {
     ca_file = "/etc/consul.d/ca.pem"
     verify_incoming = true
+    }
   }
 
   ports = {
