@@ -42,10 +42,6 @@ setup_consul() {
 
   encrypt = "${consul_gossip_key}"
 
-  auto_encrypt {
-  allow_tls = true
-  }
-
   tls {
   defaults {
     ca_file = "/etc/consul.d/ca.pem"
