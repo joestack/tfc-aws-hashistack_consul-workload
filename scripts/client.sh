@@ -1,12 +1,5 @@
 #!/bin/bash
 
-########################
-###   COMMON BLOCK   ###
-########################
-common() {
-  echo "${consul_ca}" > /etc/ssl/certs/hashistack_ca.pem
-}
-
 install_deps() {
   curl -sL 'https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key' | gpg --dearmor -o /usr/share/keyrings/getenvoy-keyring.gpg
   echo "deb [arch=amd64 signed-by=/usr/share/keyrings/getenvoy-keyring.gpg] https://deb.dl.getenvoy.io/public/deb/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/getenvoy.list
@@ -112,7 +105,7 @@ start_service() {
 cd /home/ubuntu/
 
 setup_networking
-setup_deps
+install_deps
 
 setup_consul
 #consul_service
