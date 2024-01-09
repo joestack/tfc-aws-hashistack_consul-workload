@@ -41,6 +41,10 @@ setup_consul() {
   }
 
   encrypt = "${consul_gossip_key}"
+  
+  auto_encrypt = {
+    tls = true
+  } 
 
   tls {
   defaults {
