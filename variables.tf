@@ -8,20 +8,20 @@ variable "rs_platform_hcp" {
   default = "tfc-aws-hashistack"
 }
 
-variable "aws_region" {
-  description = "AWS region"
-  default     = "eu-west-1"
-}
+# variable "aws_region" {
+#   description = "AWS region"
+#   default     = "eu-west-1"
+# }
 
 variable "pub_key" {
   description = "the public key to be used to access the bastion host and ansible nodes"
   default     = "joestack"
 }
 
-variable "consul_version" {
-  description = "i.e. 1.11.2 or 1.11.2+ent nowadays +ent-1 'apt-cache show consul-enterprise'"
-  default     = "1.17.1+ent-1"
-}
+# variable "consul_version" {
+#   description = "i.e. 1.11.2 or 1.11.2+ent nowadays +ent-1 'apt-cache show consul-enterprise'"
+#   default     = "1.17.1+ent-1"
+# }
 
 variable "node_count" {
   description = "Amount of Consul Agent Client nodes"

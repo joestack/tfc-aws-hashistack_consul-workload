@@ -10,7 +10,7 @@ data "terraform_remote_state" "hcp" {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = local.aws_region
 }
 
 data "aws_availability_zones" "available" {
@@ -38,8 +38,10 @@ locals {
   consul_datacenter      = data.terraform_remote_state.hcp.outputs.consul_datacenter
   consul_init_token      = data.terraform_remote_state.hcp.outputs.consul_init_token
   consul_gossip_key      = data.terraform_remote_state.hcp.outputs.consul_gossip_key
-  consul_apt             = length(split("+", var.consul_version)) == 2 ? "consul-enterprise" : "consul"
+  consul_apt             = length(split("+", local.consul_version)) == 2 ? "consul-enterprise" : "consul"
   consul_ca_file         = data.terraform_remote_state.hcp.outputs.consul_ca_file
+  consul_version         = data.terraform_remote_state.hcp.outputs.consul_version
+  aws_region             = data.terraform_remote_state.hcp.outputs.aws_region
   vpc_id                 = data.terraform_remote_state.hcp.outputs.vpc_id
   vpc_cidr               = data.terraform_remote_state.hcp.outputs.vpc_cidr
   consul_vpc_security_id = data.terraform_remote_state.hcp.outputs.consul_vpc_security_id
@@ -66,7 +68,7 @@ data "template_file" "client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
-      consul_version    = var.consul_version
+      consul_version    = local.consul_version
       consul_apt        = local.consul_apt
       consul_svc_name   = "webservice"
       consul_svc_id     = "webservice-${count.index + 1}"
@@ -153,87 +155,3 @@ resource "aws_instance" "consul_client_web" {
 
 
 
-
-// Security groups
-# resource "aws_security_group" "allow_ssh" {
-#   name        = "allow_ssh"
-#   description = "Allow SSH inbound traffic"
-#   #vpc_id      = data.aws_vpc.selected.id
-#   vpc_id      = local.vpc_id
-
-
-#   ingress {
-#     description      = "SSH into instance"
-#     from_port        = 22
-#     to_port          = 22
-#     protocol         = "tcp"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#     ipv6_cidr_blocks = ["::/0"]
-#   }
-
-#   tags = {
-#     Name = "allow_ssh"
-#   }
-# }
-
-# resource "aws_security_group" "my_asg" {
-#   name        = "my_asg"
-#   description = "Allow my inbound traffic"
-#   #vpc_id      = data.aws_vpc.selected.id
-#   vpc_id      = local.vpc_id
-# }
-
-# resource "aws_security_group_rule" "egress" {
-#   security_group_id = aws_security_group.my_asg.id
-#   type              = "egress"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]  
-# }
-
-# resource "aws_security_group_rule" "consul-api" {
-#   #count             = var.consul_enabled ? 1 : 0
-#   security_group_id = aws_security_group.my_asg.id
-#   type              = "ingress"
-#   from_port         = 8500
-#   to_port           = 8503
-#   protocol          = "tcp"
-#   cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]  
-#   #cidr_blocks       = [var.whitelist_ip]
-# }
-
-# resource "aws_security_group_rule" "consul-dns-tcp" {
-#   #count             = var.consul_enabled ? 1 : 0
-#   security_group_id = aws_security_group.my_asg.id
-#   type              = "ingress"
-#   from_port         = 8600
-#   to_port           = 8600
-#   protocol          = "tcp"
-#   cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]
-# }
-
-# resource "aws_security_group_rule" "consul-dns-udp" {
-#   #count             = var.consul_enabled ? 1 : 0
-#   security_group_id = aws_security_group.my_asg.id
-#   type              = "ingress"
-#   from_port         = 8600
-#   to_port           = 8600
-#   protocol          = "udp"
-#   cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]
-# }
-
-# resource "aws_security_group_rule" "consul-sidecar" {
-#   #count             = var.consul_enabled ? 1 : 0
-#   security_group_id = aws_security_group.my_asg.id
-#   type              = "ingress"
-#   from_port         = 21000
-#   to_port           = 21255
-#   protocol          = "tcp"
-#   cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]
-# }
