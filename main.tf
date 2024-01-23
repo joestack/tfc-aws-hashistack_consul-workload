@@ -108,6 +108,71 @@ resource "aws_instance" "consul_client_web" {
   }
 }
 
+
+
+
+
+
+
+
+data "template_file" "db-client" {
+  count = var.node_count
+  template = (join("\n", tolist([
+    file("${path.root}/scripts/base.sh"),
+    file("${path.root}/scripts/client.sh")
+  ])))
+  vars = {
+      consul_ca         = local.consul_ca_file
+      datacenter        = local.consul_datacenter
+      consul_cluster    = local.consul_cluster_addr
+      consul_vpc_security_id = local.consul_vpc_security_id
+      consul_gossip_key = local.consul_gossip_key
+      vpc_cidr          = local.vpc_cidr
+      consul_acl_token  = local.consul_init_token
+      consul_version    = local.consul_version
+      consul_apt        = local.consul_apt
+      consul_svc_name   = "dbservice"
+      consul_svc_id     = "dbservice-${count.index + 1}"
+      service_name      = "consul",
+      service_cmd       = "/usr/bin/consul agent -data-dir /var/consul -config-dir=/etc/consul.d/",
+      }
+}
+
+data "template_cloudinit_config" "db-client" {
+  count         = var.node_count
+  gzip          = true
+  base64_encode = true
+  part {
+    content_type = "text/x-shellscript"
+    content      = element(data.template_file.db-client.*.rendered, count.index)
+  }
+}
+
+
+
+
+# 
+// Consul client instance
+resource "aws_instance" "consul_client_db" {
+  count                       = var.node_count
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.small"
+  associate_public_ip_address = true
+  subnet_id                   = element(local.hashistack_subnet, count.index)
+  vpc_security_group_ids    = [ local.consul_vpc_security_id ]
+  key_name                  = var.pub_key
+  user_data = element(data.template_cloudinit_config.db-client.*.rendered, count.index)
+
+
+  tags = {
+    Name = "dbservice-${count.index}"
+  }
+}
+
+
+
+
+
 # resource "aws_instance" "consul_client_db" {
 #   count                       = 3
 #   ami                         = data.aws_ami.ubuntu.id
