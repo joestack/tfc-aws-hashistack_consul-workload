@@ -126,6 +126,7 @@ data "template_file" "db-client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
+      consul_services_token = local.consul_services_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
       consul_svc_name   = "dbservice"
