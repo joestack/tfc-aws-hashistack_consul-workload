@@ -43,7 +43,7 @@ setup_consul() {
   acl = {
     tokens = {
         agent = "${consul_acl_token}"
-        config_file_service_registration = "${consul_services_token}"
+        default = "${consul_services_token}"
     }
   }
 
