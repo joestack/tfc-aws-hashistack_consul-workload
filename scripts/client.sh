@@ -115,7 +115,7 @@ setup_networking
 install_deps
 
 setup_consul
-#consul_service
+consul_service
 
 start_service "consul"
 
