@@ -1,7 +1,7 @@
 # Basic usage
 
 provider "consul" {
-  address    = local.consul_cluster_addr
+  address    = "${local.consul_cluster_addr}:8500"
   datacenter = local.consul_datacenter
   token      = local.consul_init_token
 }
