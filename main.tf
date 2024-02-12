@@ -9,6 +9,17 @@ data "terraform_remote_state" "hcp" {
   }
 }
 
+data "terraform_remote_state" "l2" {
+  backend = "remote"
+
+  config = {
+    organization = var.tfc_state_org
+    workspaces = {
+      name = var.rs_platform_l2
+    }
+  }
+}
+
 provider "aws" {
   region = local.aws_region
 }
@@ -47,6 +58,8 @@ locals {
   vpc_cidr               = data.terraform_remote_state.hcp.outputs.vpc_cidr
   consul_vpc_security_id = data.terraform_remote_state.hcp.outputs.consul_vpc_security_id
   hashistack_subnet      = data.terraform_remote_state.hcp.outputs.hashistack_subnet
+  vault_user             = data.terraform_remote_state.l2.outputs.vault_user
+  vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
 }
 
 

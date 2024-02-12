@@ -8,6 +8,11 @@ variable "rs_platform_hcp" {
   default = "tfc-aws-hashistack"
 }
 
+variable "rs_platform_l2" {
+  description = "TFC Worspace to retrive 2nd Layer infromation from"
+  default     = "hashistack-l2-services"
+}
+
 # variable "aws_region" {
 #   description = "AWS region"
 #   default     = "eu-west-1"
