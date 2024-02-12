@@ -14,4 +14,5 @@ output "consul_token" {
 
 output "consul_agent_token" {
   value = data.vault_generic_secret.consul_agent_token.data["token"]
+  sensitive = true
 }
