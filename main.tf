@@ -48,7 +48,8 @@ locals {
   consul_cluster_addr    = data.terraform_remote_state.hcp.outputs.cluster_url
   consul_datacenter      = data.terraform_remote_state.hcp.outputs.consul_datacenter
   consul_init_token      = data.terraform_remote_state.hcp.outputs.consul_init_token
-  consul_services_token  = random_uuid.services.id
+  consul_agent_token     = data.vault_generic_secret.consul_agent_token.data["token"]
+  #consul_services_token  = random_uuid.services.id
   consul_gossip_key      = data.terraform_remote_state.hcp.outputs.consul_gossip_key
   consul_apt             = length(split("+", local.consul_version)) == 2 ? "consul-enterprise" : "consul"
   consul_ca_file         = data.terraform_remote_state.hcp.outputs.consul_ca_file
@@ -77,7 +78,7 @@ data "template_file" "client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
-      consul_services_token = local.consul_services_token
+      consul_agent_token = local.consul_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
       consul_svc_name   = "webservice"
@@ -139,7 +140,7 @@ data "template_file" "db-client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
-      consul_services_token = local.consul_services_token
+      consul_agent_token = local.consul_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
       consul_svc_name   = "dbservice"
