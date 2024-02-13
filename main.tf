@@ -61,6 +61,7 @@ locals {
   hashistack_subnet      = data.terraform_remote_state.hcp.outputs.hashistack_subnet
   vault_user             = data.terraform_remote_state.l2.outputs.vault_user
   vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
+  vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
 }
 
 
@@ -79,6 +80,7 @@ data "template_file" "client" {
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
       consul_agent_token = local.consul_agent_token
+      vault_agent_token = local.vault_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
       consul_svc_name   = "webservice"

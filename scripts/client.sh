@@ -6,7 +6,7 @@ install_deps() {
   apt update -qy
   version="${consul_version}"
   consul_package="consul-enterprise="$${version:1}"*"
-  apt install -qy apt-transport-https gnupg2 curl lsb-release nomad ${consul_apt}=${consul_version} getenvoy-envoy unzip jq apache2-utils nginx
+  apt install -qy apt-transport-https gnupg2 curl lsb-release nomad ${consul_apt}=${consul_version} getenvoy-envoy unzip jq apache2-utils nginx vault
 
   curl -fsSL https://get.docker.com -o get-docker.sh
   sh ./get-docker.sh
@@ -20,6 +20,82 @@ setup_networking() {
   mkdir -p /opt/cni/bin
   tar -C /opt/cni/bin -xzf cni-plugins.tgz
 }
+
+vault_agent() {
+
+  echo ${vault_agent_token} > /etc/consul.d/.vault-token
+
+  tee /etc/consul.d/vault_agent.hcl > /dev/null <<EOF
+pid_file = "./pidfile"
+
+vault {
+  address = "https://${consul_cluster}:8200"
+  retry {
+    num_retries = 5
+  }
+}
+
+auto_auth {
+  method {
+    type = "token_file"
+
+    config = {
+      token_file_path = "/etc/consul.d/.vault-token"
+    }
+  }
+}
+
+  sink "file" {
+    config = {
+      path = "/etc/consul.d/.vault"
+    }
+  }
+
+  sink "file" {
+    wrap_ttl = "5m"
+    aad_env_var = "TEST_AAD_ENV"
+    dh_type = "curve25519"
+    dh_path = "/tmp/file-foo-dhpath2"
+    config = {
+      path = "/tmp/file-bar"
+    }
+  }
+}
+
+cache {
+  // An empty cache stanza still enables caching
+}
+
+api_proxy {
+  use_auto_auth_token = true
+}
+
+listener "unix" {
+  address = "/path/to/socket"
+  tls_disable = true
+
+  agent_api {
+    enable_quit = true
+  }
+}
+
+listener "tcp" {
+  address = "127.0.0.1:8100"
+  tls_disable = true
+}
+
+template {
+  source = "/etc/vault/server.key.ctmpl"
+  destination = "/etc/vault/server.key"
+}
+
+template {
+  source = "/etc/vault/server.crt.ctmpl"
+  destination = "/etc/vault/server.crt"
+}
+EOF
+}
+
 
 setup_consul() {
   mkdir --parents /etc/consul.d /var/consul
@@ -116,6 +192,8 @@ install_deps
 
 setup_consul
 consul_service
+
+vault_agent
 
 start_service "consul"
 
