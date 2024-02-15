@@ -62,7 +62,7 @@ locals {
   vault_user             = data.terraform_remote_state.l2.outputs.vault_user
   vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
   vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
-  tls_self_signed_cert   = data.terraform_remote_state.hcp.outputs.tls_self_signed_cert
+  tls_self_signed_cert   = base64encode(data.terraform_remote_state.hcp.outputs.tls_self_signed_cert)
 }
 
 
