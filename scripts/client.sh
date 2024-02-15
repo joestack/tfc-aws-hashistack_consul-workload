@@ -54,10 +54,9 @@ auto_auth {
 template {
   destination = "/etc/consul.d/acl_agent.hcl"
   contents = <<EOT
-    {{ with secret "consul-services/creds/services-role" }}
     acl = {
     tokens = {
-        agent = "{{ .Data.data.token }}"
+        agent = "{{ file "/home/ubuntu/sink" }}"
     }
   }
 EOT
