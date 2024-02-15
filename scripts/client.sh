@@ -29,6 +29,11 @@ vault_agent() {
 # Uncomment this to have Agent run once (e.g. when running as an initContainer)
 # exit_after_auth = true
 pid_file = "/home/ubuntu/pidfile"
+
+vault {
+  address = "https://${consul_cluster}:8200"
+}
+
 auto_auth {
     method {
       type = "token_file"
