@@ -12,7 +12,7 @@ output "consul_token" {
   value = local.consul_init_token
 }
 
-output "consul_agent_token" {
-  value = data.vault_generic_secret.consul_agent_token.data["token"]
-  sensitive = true
-}
+# output "consul_agent_token" {
+#   value = data.vault_generic_secret.consul_agent_token.data["token"]
+#   sensitive = true
+# }
