@@ -23,7 +23,7 @@ setup_networking() {
 
 vault_agent() {
 
-  echo ${tls_self_signed_cert} > /etc/ssl/certs/joestack.pem
+  echo ${tls_self_signed_cert} >> /etc/ssl/certs/joestack.pem
 
   echo ${vault_agent_token} > /etc/consul.d/.vault-token
 
