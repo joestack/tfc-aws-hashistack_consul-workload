@@ -26,75 +26,110 @@ vault_agent() {
   echo ${vault_agent_token} > /etc/consul.d/.vault-token
 
   tee /etc/consul.d/vault_agent.hcl > /dev/null <<EOF
-pid_file = "./pidfile"
-
-vault {
-  address = "https://${consul_cluster}:8200"
-  retry {
-    num_retries = 5
-  }
-}
-
+# Uncomment this to have Agent run once (e.g. when running as an initContainer)
+# exit_after_auth = true
+pid_file = "/home/ubuntu/pidfile"
 auto_auth {
-  method {
-    type = "token_file"
-
-    config = {
-      token_file_path = "/etc/consul.d/.vault-token"
+    method {
+      type = "token_file"
+      config = {
+        token_file_path = "/etc/consul.d/.vault-token"
+      }
     }
-  }
-}
-
-  sink "file" {
-    config = {
-      path = "/etc/consul.d/.vault"
+    
+    sink "file" {
+        config = {
+            path = "/home/ubuntu/sink"
+        }
     }
-  }
-
-  sink "file" {
-    wrap_ttl = "5m"
-    aad_env_var = "TEST_AAD_ENV"
-    dh_type = "curve25519"
-    dh_path = "/tmp/file-foo-dhpath2"
-    config = {
-      path = "/tmp/file-bar"
-    }
-  }
-}
-
-cache {
-  // An empty cache stanza still enables caching
-}
-
-api_proxy {
-  use_auto_auth_token = true
-}
-
-listener "unix" {
-  address = "/path/to/socket"
-  tls_disable = true
-
-  agent_api {
-    enable_quit = true
-  }
-}
-
-listener "tcp" {
-  address = "127.0.0.1:8100"
-  tls_disable = true
 }
 
 template {
-  source = "/etc/vault/server.key.ctmpl"
-  destination = "/etc/vault/server.key"
-}
-
-template {
-  source = "/etc/vault/server.crt.ctmpl"
-  destination = "/etc/vault/server.crt"
+  destination = "/etc/consul.d/acl_agent.hcl"
+  contents = <<EOT
+    {{ with secret "consul-services/creds/services-role" }}
+    acl = {
+    tokens = {
+        agent = "{{ .Data.data.token }}"
+    }
+  }
+EOT
 }
 EOF
 }
+
+
+
+
+
+
+# pid_file = "./pidfile"
+
+# vault {
+#   address = "https://${consul_cluster}:8200"
+#   retry {
+#     num_retries = 5
+#   }
+# }
+
+# auto_auth {
+#   method {
+#     type = "token_file"
+
+#     config = {
+#       token_file_path = "/etc/consul.d/.vault-token"
+#     }
+#   }
+# }
+
+#   sink "file" {
+#     config = {
+#       path = "/etc/consul.d/.vault"
+#     }
+#   }
+
+#   sink "file" {
+#     wrap_ttl = "5m"
+#     aad_env_var = "TEST_AAD_ENV"
+#     dh_type = "curve25519"
+#     dh_path = "/tmp/file-foo-dhpath2"
+#     config = {
+#       path = "/tmp/file-bar"
+#     }
+#   }
+# }
+
+# cache {
+#   // An empty cache stanza still enables caching
+# }
+
+# api_proxy {
+#   use_auto_auth_token = true
+# }
+
+# listener "unix" {
+#   address = "/path/to/socket"
+#   tls_disable = true
+
+#   agent_api {
+#     enable_quit = true
+#   }
+# }
+
+# listener "tcp" {
+#   address = "127.0.0.1:8100"
+#   tls_disable = true
+# }
+
+# template {
+#   source = "/etc/vault/server.key.ctmpl"
+#   destination = "/etc/vault/server.key"
+# }
+
+# template {
+#   source = "/etc/vault/server.crt.ctmpl"
+#   destination = "/etc/vault/server.crt"
+# }
 
 
 setup_consul() {
