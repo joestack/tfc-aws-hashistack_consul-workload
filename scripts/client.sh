@@ -163,7 +163,7 @@ install_deps
 
 setup_consul
 consul_service
-
+sleep 20
 vault_agent
 
 start_service "consul"
