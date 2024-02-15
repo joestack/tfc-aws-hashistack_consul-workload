@@ -151,12 +151,6 @@ setup_consul() {
   enabled = true
   }
 
-  acl = {
-    tokens = {
-        agent = "${consul_agent_token}"
-    }
-  }
-
   encrypt = "${consul_gossip_key}"
   
   auto_encrypt = {
