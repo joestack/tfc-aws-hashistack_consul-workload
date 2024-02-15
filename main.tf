@@ -62,6 +62,7 @@ locals {
   vault_user             = data.terraform_remote_state.l2.outputs.vault_user
   vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
   vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
+  tls_self_signed_cert   = data.terraform_remote_state.hcp.outputs.tls_self_signed_cert
 }
 
 
@@ -72,6 +73,7 @@ data "template_file" "client" {
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
+      tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
@@ -135,6 +137,7 @@ data "template_file" "db-client" {
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
+      tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
