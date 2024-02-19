@@ -135,11 +135,9 @@ auto_auth {
 template {
   destination = "/etc/consul.d/acl_agent.hcl"
   contents = <<EOT
-  {{ with secret "consul-services/creds/services-role" }}
     acl = {
     tokens = {
-        agent = "{{ .Data.data.token }}"
-  {{ end }}
+        agent = "{{ with secret \"consul-services/creds/services-role\" }}{{ .Data.data.token }}{{ end }}"
     }
   }
 EOT
