@@ -144,7 +144,7 @@ EOT
 }
 EOF
 
-vault agent -config=/etc/consul.d/helper/vault_agent.hcl
+vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-file=/var/log -log-level=debug &
 
 }
 
@@ -163,7 +163,7 @@ install_deps
 
 setup_consul
 consul_service
-sleep 20
+
 vault_agent
 
 start_service "consul"
