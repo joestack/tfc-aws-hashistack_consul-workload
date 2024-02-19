@@ -144,7 +144,7 @@ EOT
 }
 EOF
 
-vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-file=/var/log -log-level=debug &
+vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-file=/var/log/ -log-level=debug &
 
 }
 
