@@ -125,19 +125,21 @@ auto_auth {
       }
     }
     
-    sink "file" {
-        config = {
-            path = "/home/ubuntu/sink"
-        }
-    }
+    # sink "file" {
+    #     config = {
+    #         path = "/home/ubuntu/sink"
+    #     }
+    # }
 }
 
 template {
   destination = "/etc/consul.d/acl_agent.hcl"
   contents = <<EOT
+  {{ with secret "consul-services/creds/services-role" }}
     acl = {
     tokens = {
-        agent = "{{ file "/home/ubuntu/sink" }}"
+        agent = "{{ Data.data.token }}"
+  {{ end }}
     }
   }
 EOT
