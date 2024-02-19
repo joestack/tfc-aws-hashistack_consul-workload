@@ -144,7 +144,7 @@ EOT
 }
 EOF
 
-vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-file=/var/log/ -log-level=debug &
+vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-level=debug
 
 }
 
@@ -164,8 +164,8 @@ install_deps
 setup_consul
 consul_service
 
-vault_agent
-
+vault_agent &
+sleep 20
 start_service "consul"
 
 # nomad and consul service is type simple and might not be up and running just yet.
