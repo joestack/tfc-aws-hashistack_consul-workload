@@ -138,7 +138,7 @@ template {
   {{ with secret "consul-services/creds/services-role" }}
     acl = {
     tokens = {
-        agent = "{{ Data.data.token }}"
+        agent = "{{ .Data.data.token }}"
   {{ end }}
     }
   }
