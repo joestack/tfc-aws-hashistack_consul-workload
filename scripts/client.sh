@@ -110,7 +110,7 @@ vault_agent() {
 
   tee /etc/consul.d/helper/vault_agent.hcl > /dev/null <<EOF
 # Uncomment this to have Agent run once (e.g. when running as an initContainer)
-# exit_after_auth = true
+exit_after_auth = true
 pid_file = "/home/ubuntu/pidfile"
 
 vault {
@@ -164,7 +164,7 @@ install_deps
 setup_consul
 consul_service
 
-vault_agent &
+vault_agent
 sleep 20
 start_service "consul"
 
