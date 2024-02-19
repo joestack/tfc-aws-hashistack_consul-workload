@@ -2,9 +2,9 @@ data "terraform_remote_state" "hcp" {
   backend = "remote"
 
   config = {
-    organization = var.tfc_state_org
+    organization = var.remote_state_org
     workspaces = {
-      name = var.rs_platform_hcp
+      name = var.remote_state_l1
     }
   }
 }
@@ -13,9 +13,9 @@ data "terraform_remote_state" "l2" {
   backend = "remote"
 
   config = {
-    organization = var.tfc_state_org
+    organization = var.remote_state_org
     workspaces = {
-      name = var.rs_platform_l2
+      name = var.remote_state_l2
     }
   }
 }

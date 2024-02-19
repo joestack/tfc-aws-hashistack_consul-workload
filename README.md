@@ -27,8 +27,8 @@ To avoid to cut and paste any information (cluster address, acl token, VPC, ..) 
 
 | Key | Description | Default |
 | - | :- | :- |
-| tfc_state_org | (required) The name of the Terraform Organization that contains the Consul platform (tfc-aws-hashistack) | TFC_Org |
-| rs_platform_hcp | (required) The name of the Workspace that contains the Consul platform | tfc-aws-hashistack |
+| remote_state_org" | (required) The name of the Terraform Organization that contains the Consul platform (tfc-aws-hashistack) | TFC_Org |
+| remote_state_l1 | (required) The name of the Workspace that contains the Consul platform | tfc-aws-hashistack |
 | node_count | (optional) Amount of workload instances | 3 |
 | pub_key | (required) Name of the public part of the SSH key (already existing in your AWD region) | joestack |
 
