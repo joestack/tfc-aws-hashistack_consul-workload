@@ -147,8 +147,8 @@ template_config {
 }
 
 template {
-    source               = "/etc/consul.d/helper/acl_agent.tmpl
-    destination          = "/etc/consul.d/acl_agent.hcl
+    source               = "/etc/consul.d/helper/acl_agent.tmpl"
+    destination          = "/etc/consul.d/acl_agent.hcl"
     error_on_missing_key = true
 }
 
