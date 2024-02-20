@@ -112,7 +112,7 @@ vault_agent() {
 {{ with secret "consul-services/creds/services-role" }}
 acl = {
     tokens = {
-        agent = "{{ .Data.data.token }}"
+        agent = "{{ .Data.token }}"
     }
 }
 {{ end }}
