@@ -106,7 +106,17 @@ vault_agent() {
 
   echo ${tls_self_signed_cert} | base64 -d > /etc/ssl/certs/joestack.pem
 
-  echo ${vault_agent_token} > /etc/consul.d/helper/.vault-token
+  echo ${vault_agent_token} > /etc/consul.d/helper/vault-agent-token
+
+    tee /etc/consul.d/helper/acl_agent.tmpl > /dev/null <<EOF
+{{ with secret "consul-services/creds/services-role" }}
+acl = {
+    tokens = {
+        agent = "{{ .Data.data.token }}"
+    }
+}
+{{ end }}
+EOF
 
   tee /etc/consul.d/helper/vault_agent.hcl > /dev/null <<EOF
 # Uncomment this to have Agent run once (e.g. when running as an initContainer)
@@ -121,7 +131,7 @@ auto_auth {
     method {
       type = "token_file"
       config = {
-        token_file_path = "/etc/consul.d/helper/.vault-token"
+        token_file_path = "/etc/consul.d/helper/vault-agent-token"
       }
     }
     
@@ -132,19 +142,29 @@ auto_auth {
     # }
 }
 
-template {
-  destination = "/etc/consul.d/acl_agent.hcl"
-  contents = <<EOT
-    acl = {
-    tokens = {
-        agent = "{{ with secret \"consul-services/creds/services-role\" }}{{ .Data.data.token }}{{ end }}"
-    }
-  }
-EOT
+template_config {
+    exit_on_retry_failure = true
 }
+
+template {
+    source               = "/etc/consul.d/helper/acl_agent.tmpl
+    destination          = "/etc/consul.d/acl_agent.hcl
+    error_on_missing_key = true
+}
+
+# template {
+#   destination = "/etc/consul.d/acl_agent.hcl"
+#   contents = <<EOT
+#     acl = {
+#     tokens = {
+#         agent = "{{ with secret \"consul-services/creds/services-role\" }}{{ .Data.data.token }}{{ end }}"
+#     }
+#   }
+# EOT
+# }
 EOF
 
-vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-level=debug
+vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-level=debug -log-file=/var/log/agent.log
 
 }
 
