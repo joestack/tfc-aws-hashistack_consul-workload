@@ -84,8 +84,8 @@ data "template_file" "client" {
       vault_agent_token = local.vault_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
-      consul_svc_name   = "webservice"
-      consul_svc_id     = "webservice-${count.index + 1}"
+      consul_svc_name   = "web-node"
+      consul_svc_id     = format("web-node-%02d", count.index +1)
       service_name      = "consul",
       service_cmd       = "/usr/bin/consul agent -data-dir /var/consul -config-dir=/etc/consul.d/",
       }
@@ -148,8 +148,8 @@ data "template_file" "db-client" {
       vault_agent_token = local.vault_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
-      consul_svc_name   = "dbservice"
-      consul_svc_id     = "dbservice-${count.index + 1}"
+      consul_svc_name   = "db-node"
+      consul_svc_id     = format("db-node-%02d", count.index +1)
       service_name      = "consul",
       service_cmd       = "/usr/bin/consul agent -data-dir /var/consul -config-dir=/etc/consul.d/",
       }
