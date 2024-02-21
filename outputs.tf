@@ -16,6 +16,18 @@ output "tls_self_signed_cert" {
   value = local.tls_self_signed_cert
 }
 
+output "consul_cluster_addr" {
+  value = "${local.consul_cluster_addr}:8500"
+}
+
+output "vault_cluster_url" {
+  value = "${local.consul_cluster_addr}:8200"
+}
+
+output "vault" {
+  value = local.vault_root_token
+}
+
 # output "consul_agent_token" {
 #   value = data.vault_generic_secret.consul_agent_token.data["token"]
 #   sensitive = true

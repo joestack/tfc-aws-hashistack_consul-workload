@@ -104,7 +104,8 @@ vault_agent() {
   mkdir --parents /etc/consul.d/helper
   chown --recursive consul:consul /etc/consul.d/helper
 
-  echo ${tls_self_signed_cert} | base64 -d > /etc/ssl/certs/joestack.pem
+  #echo ${tls_self_signed_cert} | base64 -d > /etc/ssl/certs/joestack.pem
+  echo ${consul_ca} | base64 -d > /etc/ssl/certs/joestack.pem
 
   echo ${vault_agent_token} > /etc/consul.d/helper/vault-agent-token
 
