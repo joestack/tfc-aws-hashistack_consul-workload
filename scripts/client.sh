@@ -136,11 +136,6 @@ auto_auth {
       }
     }
     
-    # sink "file" {
-    #     config = {
-    #         path = "/home/ubuntu/sink"
-    #     }
-    # }
 }
 
 template_config {
@@ -153,16 +148,7 @@ template {
     error_on_missing_key = true
 }
 
-# template {
-#   destination = "/etc/consul.d/acl_agent.hcl"
-#   contents = <<EOT
-#     acl = {
-#     tokens = {
-#         agent = "{{ with secret \"consul-services/creds/services-role\" }}{{ .Data.data.token }}{{ end }}"
-#     }
-#   }
-# EOT
-# }
+
 EOF
 
 vault agent -config=/etc/consul.d/helper/vault_agent.hcl -log-level=debug -log-file=/var/log/agent.log
