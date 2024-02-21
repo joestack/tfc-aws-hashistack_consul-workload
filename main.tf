@@ -61,7 +61,7 @@ locals {
   # vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
   vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
   vault_root_token       = data.terraform_remote_state.l2.outputs.vault_root_token
-  tls_self_signed_cert   = base64encode(data.terraform_remote_state.hcp.outputs.tls_self_signed_cert)
+  #tls_self_signed_cert   = base64encode(data.terraform_remote_state.hcp.outputs.tls_self_signed_cert)
 }
 
 
@@ -72,7 +72,7 @@ data "template_file" "client" {
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
-      tls_self_signed_cert = local.tls_self_signed_cert
+      #tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
@@ -118,7 +118,7 @@ resource "aws_instance" "consul_client_web" {
 
 
   tags = {
-    Name = "webservice-${count.index}"
+    Name = format("web-node-%02d", count.index +1)
   }
 }
 
@@ -136,7 +136,7 @@ data "template_file" "db-client" {
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
-      tls_self_signed_cert = local.tls_self_signed_cert
+      #tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
@@ -182,7 +182,7 @@ resource "aws_instance" "consul_client_db" {
 
 
   tags = {
-    Name = "dbservice-${count.index}"
+    Name = format("db-node-%02d", count.index +1)
   }
 }
 

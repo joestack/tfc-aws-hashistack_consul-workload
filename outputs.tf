@@ -13,18 +13,18 @@ output "consul_token" {
 }
 
 output "tls_self_signed_cert" {
-  value = local.tls_self_signed_cert
+  value = local.consul_ca_file
 }
 
 output "consul_cluster_addr" {
-  value = "${local.consul_cluster_addr}:8500"
+  value = "https://${local.consul_cluster_addr}:8500"
 }
 
 output "vault_cluster_url" {
-  value = "${local.consul_cluster_addr}:8200"
+  value = "https://${local.consul_cluster_addr}:8200"
 }
 
-output "vault" {
+output "vault_root_token" {
   value = local.vault_root_token
 }
 
