@@ -17,7 +17,7 @@ output "tls_self_signed_cert" {
 }
 
 output "consul_cluster_addr" {
-  value = "https://${local.consul_cluster_addr}:8500"
+  value = "https://${local.consul_cluster_addr}:8501"
 }
 
 output "vault_cluster_url" {
