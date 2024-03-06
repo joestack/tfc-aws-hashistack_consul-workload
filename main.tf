@@ -1,4 +1,4 @@
-data "terraform_remote_state" "hcp" {
+data "terraform_remote_state" "l1" {
   backend = "remote"
 
   config = {
@@ -45,34 +45,33 @@ data "aws_ami" "ubuntu" {
 }
 
 locals {
-  consul_cluster_addr    = data.terraform_remote_state.hcp.outputs.cluster_url
-  consul_datacenter      = data.terraform_remote_state.hcp.outputs.consul_datacenter
-  consul_init_token      = data.terraform_remote_state.hcp.outputs.consul_init_token
-  consul_gossip_key      = data.terraform_remote_state.hcp.outputs.consul_gossip_key
+  consul_cluster_addr    = data.terraform_remote_state.l1.outputs.cluster_url
+  consul_datacenter      = data.terraform_remote_state.l1.outputs.consul_datacenter
+  consul_init_token      = data.terraform_remote_state.l1.outputs.consul_init_token
+  consul_gossip_key      = data.terraform_remote_state.l1.outputs.consul_gossip_key
   consul_apt             = length(split("+", local.consul_version)) == 2 ? "consul-enterprise" : "consul"
-  consul_ca_file         = data.terraform_remote_state.hcp.outputs.consul_ca_file
-  consul_version         = data.terraform_remote_state.hcp.outputs.consul_version
-  aws_region             = data.terraform_remote_state.hcp.outputs.aws_region
-  vpc_id                 = data.terraform_remote_state.hcp.outputs.vpc_id
-  vpc_cidr               = data.terraform_remote_state.hcp.outputs.vpc_cidr
-  consul_vpc_security_id = data.terraform_remote_state.hcp.outputs.consul_vpc_security_id
-  hashistack_subnet      = data.terraform_remote_state.hcp.outputs.hashistack_subnet
+  consul_ca_file         = data.terraform_remote_state.l1.outputs.consul_ca_file
+  consul_version         = data.terraform_remote_state.l1.outputs.consul_version
+  aws_region             = data.terraform_remote_state.l1.outputs.aws_region
+  vpc_id                 = data.terraform_remote_state.l1.outputs.vpc_id
+  vpc_cidr               = data.terraform_remote_state.l1.outputs.vpc_cidr
+  consul_vpc_security_id = data.terraform_remote_state.l1.outputs.consul_vpc_security_id
+  hashistack_subnet      = data.terraform_remote_state.l1.outputs.hashistack_subnet
   # vault_user             = data.terraform_remote_state.l2.outputs.vault_user
   # vault_user_pw          = data.terraform_remote_state.l2.outputs.vault_user_pw
   vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
   vault_root_token       = data.terraform_remote_state.l2.outputs.vault_root_token
-  #tls_self_signed_cert   = base64encode(data.terraform_remote_state.hcp.outputs.tls_self_signed_cert)
+  #tls_self_signed_cert   = base64encode(data.terraform_remote_state.l1.outputs.tls_self_signed_cert)
 }
 
 
-data "template_file" "client" {
+data "template_file" "web-client" {
   count = var.node_count
   template = (join("\n", tolist([
     file("${path.root}/scripts/base.sh"),
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
-      #tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
@@ -80,7 +79,6 @@ data "template_file" "client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
-      #consul_agent_token = local.consul_agent_token
       vault_agent_token = local.vault_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
@@ -91,13 +89,13 @@ data "template_file" "client" {
       }
 }
 
-data "template_cloudinit_config" "client" {
+data "template_cloudinit_config" "web-client" {
   count         = var.node_count
   gzip          = true
   base64_encode = true
   part {
     content_type = "text/x-shellscript"
-    content      = element(data.template_file.client.*.rendered, count.index)
+    content      = element(data.template_file.web-client.*.rendered, count.index)
   }
 }
 
@@ -114,20 +112,13 @@ resource "aws_instance" "consul_client_web" {
   subnet_id                   = element(local.hashistack_subnet, count.index)
   vpc_security_group_ids    = [ local.consul_vpc_security_id ]
   key_name                  = var.pub_key
-  user_data = element(data.template_cloudinit_config.client.*.rendered, count.index)
+  user_data = element(data.template_cloudinit_config.web-client.*.rendered, count.index)
 
 
   tags = {
     Name = format("web-node-%02d", count.index +1)
   }
 }
-
-
-
-
-
-
-
 
 data "template_file" "db-client" {
   count = var.node_count
@@ -136,7 +127,6 @@ data "template_file" "db-client" {
     file("${path.root}/scripts/client.sh")
   ])))
   vars = {
-      #tls_self_signed_cert = local.tls_self_signed_cert
       consul_ca         = local.consul_ca_file
       datacenter        = local.consul_datacenter
       consul_cluster    = local.consul_cluster_addr
@@ -144,7 +134,6 @@ data "template_file" "db-client" {
       consul_gossip_key = local.consul_gossip_key
       vpc_cidr          = local.vpc_cidr
       consul_acl_token  = local.consul_init_token
-      #consul_agent_token = local.consul_agent_token
       vault_agent_token = local.vault_agent_token
       consul_version    = local.consul_version
       consul_apt        = local.consul_apt
@@ -164,9 +153,6 @@ data "template_cloudinit_config" "db-client" {
     content      = element(data.template_file.db-client.*.rendered, count.index)
   }
 }
-
-
-
 
 # 
 // Consul client instance
