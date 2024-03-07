@@ -62,9 +62,6 @@ locals {
   vault_agent_token      = data.terraform_remote_state.l2.outputs.vault_agent_token
   vault_root_token       = data.terraform_remote_state.l2.outputs.vault_root_token
   #tls_self_signed_cert   = base64encode(data.terraform_remote_state.l1.outputs.tls_self_signed_cert)
-  web_subnet             = data.terraform_remote_state.l1.outputs.web_subnet
-  db_subnet              = data.terraform_remote_state.l1.outputs.db_subnet
-  workload_vpc_security_id = data.terraform_remote_state.l1.outputs.workload_vpc_security_id 
 }
 
 
@@ -112,8 +109,8 @@ resource "aws_instance" "consul_client_web" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
   associate_public_ip_address = true
-  subnet_id                   = local.web_subnet
-  vpc_security_group_ids    = [ local.workload_vpc_security_id ]
+  subnet_id                   = element(local.hashistack_subnet, count.index)
+  vpc_security_group_ids    = [ local.consul_vpc_security_id ]
   key_name                  = var.pub_key
   user_data = element(data.template_cloudinit_config.web-client.*.rendered, count.index)
 
@@ -164,8 +161,8 @@ resource "aws_instance" "consul_client_db" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.small"
   associate_public_ip_address = true
-  subnet_id                   = local.db_subnet
-  vpc_security_group_ids    = [ local.workload_vpc_security_id ]
+  subnet_id                   = element(local.hashistack_subnet, count.index)
+  vpc_security_group_ids    = [ local.consul_vpc_security_id ]
   key_name                  = var.pub_key
   user_data = element(data.template_cloudinit_config.db-client.*.rendered, count.index)
 
